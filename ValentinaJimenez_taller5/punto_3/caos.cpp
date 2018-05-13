@@ -56,7 +56,9 @@ int main(){
   p2 = 0;
 
 
-  for(int i = 0; i < n; i++){
+  for(int i = 1; i < n; i++){
+
+    double qant=q1;
     double k1q1 = dq1(p1);
     double k1q2 = dq2(p2);
     double k1p1 = dp1(q1);
@@ -84,10 +86,10 @@ int main(){
 
     /*cout << i*dt << " " << p2 << " " << q2 << " " << q1 << endl;*/
 
-    if( ((q1 > 0) && (q10 < 0)) || ((q1 < 0) && (q10 > 0)) ){
+    if( q1*q2 <0 ){
       cout << q2 << " " << p2 << endl;
       }
-    q10 = q1;
+  
     }
 
   return 0;
