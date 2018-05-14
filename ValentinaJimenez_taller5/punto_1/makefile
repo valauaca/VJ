@@ -1,10 +1,10 @@
-placas.pdf: placas.txt grafica.py
+placas.pdf: datos.txt grafica.py
 
 	python grafica.py
 
-placas.txt: a.out
+datos.txt: a.out
 
-	./a.out > placas.txt
+	./a.out > datos.txt
 
 a.out: placas.cpp
 
