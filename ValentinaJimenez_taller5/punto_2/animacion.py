@@ -46,17 +46,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.animation import FuncAnimation
 
+
+## metodo obtenido de internet: https://stackoverflow.com/questions/2779543/how-to-create-gif-file-from-other-format-file-in-c. El metodo no fue aprendido en clase
+
 U = genfromtxt('cue.txt', delimiter=' ')
 frms,points = shape(U)
 
 def one_frame(i):
 	Ui = U[i,:]
 	plt.cla()
-	plt.plot(Ui, c='k')
-	plt.ylim([-2.0,2.0])
+	plt.plot(Ui, c='g')
+	plt.ylim([-1.2,1.2])
 
 fig = plt.figure()
-anim = FuncAnimation(fig, one_frame, frames=int(frms/2), interval=10)
+anim = FuncAnimation(fig, one_frame, frames=int(frms/2), interval=40)
 anim.save('cuerda.gif', writer='imagemagick', fps=int(frms/4))
 
 

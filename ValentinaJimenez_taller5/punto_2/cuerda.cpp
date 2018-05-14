@@ -1,123 +1,99 @@
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
 #include <math.h>
-
-
 using namespace std;
 
-
-double avance(double cp, double cuerda1, double cuerda2, double cuerda3){
-
-	double cuerda_actual;
-
-	cuerda_actual=cuerda1+((0.5)*cp*(cuerda2+cuerda3-2.0*cuerda1));
-
-	return cuerda_actual;
+// declarar constantes
 
 
-}
-double actualiza ( double cp, double cuerda1, double cuerda2, double cuerda3, double cuerda4){
+double L = 100.0;
+double t = 200.0;
+double p = 10.0;
+double c = sqrt(40.0/p);
 
-	double cuerda_actual;
+void inicializa(double* cuerda, double dx, int n);
+void evoluciona(double* cuerda1, double* cuerda_actual, double* cuerda0, int n, double dx, double dt, double c);
+void imprime(double* cuerda, int n); 
 
-	cuerda_actual=2.0*cuerda1-cuerda2+cp*(cuerda3+cuerda4-2.0*cuerda1);
-
-	return cuerda_actual;
-
-}
 
 int main(){
 
+  double dx = 1.0;
+  double dt = 0.1;
 
-	double L=100;
-	int n=501; //OJO
-	double p=10;
-	double T=40;
-	double t=200.0;
-	double dx= L/(n);
-	double c=sqrt(T/p);
-	double dt= 0.0001*dx/c;
-	double cuerda[n];
-	double cuerda1[n];
-	double cp= dt*dt*c*c;
-	double x[n];
-	double cuerdaA;
+  int pasos_x = L/dx + 1;
+  int pasos_t = t/dt +1;
+  
+// cuerda nueva
+  double *cuerda1=new double[pasos_x];
+//cuerda inicial
+  double *cuerda0= new double[pasos_x];
+//cuerda actual
+  double *cuerda_actual= new double[pasos_x];
 
-//condiciones iniciales
+  inicializa(cuerda0,dx, pasos_x);
+  inicializa(cuerda_actual,dx, pasos_x);
 
-for (int i=0; i<n; i++){
+  //Frontera
 
-		double a=i*dx;
-		cout<< a <<" ";
+  cuerda1[0] =0;
+  cuerda1[pasos_x-1] =0;
+  
+  for(int i = 1; i<pasos_t;i++){
+    if(i !=0 && i%30 ==0){
+      imprime(cuerda0,pasos_x);
+    }
 
-
+    evoluciona(cuerda1, cuerda_actual, cuerda0, pasos_x, dx, dt, c);
+  }
+  return 0;
 }
-cout<<"\n";
+  
 
-for(int i=0; i<n; i++){
 
-		double a=(i*dx);
-		if(a<=0.8*L){
 
-			cuerda[i]=1.25*a/L;
+//funcion para inicializar valores y dar condiciones iniciales
 
-		
+
+void inicializa(double* cuerda, double dx, int n){
+
+	for (int i=0; i<n; i++){
+		double x =  i*dx;
+       		if(x <= 0.8*L){
+	 		cuerda[i] = 1.25*x/L;
+       		}
+      		else{
+	  		cuerda[i] = 5.0-(5.0*x/L);
 		}
-		else{
-	
-			cuerda[i]=5.0-(5.0*a/L);
+		cout<<cuerda[i]<<" ";
+    	}
+ 	 cout<<endl;
+}
 
-		}
-		cout<< cuerda[i] <<" ";
-
-	}
-cout<<"\n";
+// funcion que marca los pasos de la cuerda
 
 
+void evoluciona(double* cuerda1, double* cuerda_actual, double* cuerda0, int n, double dx, double dt, double c){
+  double new_dx = dx *dx;
+  double new_dt = dt * dt;
+  double k = (new_dt/new_dx)*c*c;
 
-for (int j=0; j<(200/dt); j++){
+  for (int i = 1; i<n-1; i++){
+    cuerda1[i] = (k*(cuerda_actual[i+1]-2.0*cuerda_actual[i]+cuerda_actual[i-1])) + 2*cuerda_actual[i] - cuerda0[i];
+  }  
 
-
-	if(j==0){
-
-		cuerda1[0]=0;
-		cuerda1[n]=0;
-		for(int i=1; i<n-1; i++){
-
-			cuerda1[i]=cuerda[i]+((0.5)*cp*(cuerda[i+1]+cuerda[i-1]-2.0*cuerda[i]));
-
-
-		}
-	}
-	else{
-
-
-		for (int i=1; i< n-1; i++){
-
-			double cuerda_actual=cuerda1[i];
-
-			cuerda1[i]=2.0*cuerda1[i]-cuerda[i]+cp*(cuerda1[i+1]+cuerda1[i-1]-2.0*cuerda1[i]);
-
-			cuerda[i]=cuerda_actual;
-		}
-
-		if(j%(int(200/dt)/50)==0){
-
-			for (int i=0; i<n; i++){
-
-				cout<< cuerda1[i] <<" ";
-			}
-
-		cout << "\n";
-
-		}
-	}
-
+for (int i = 0; i<n; i++){
+    cuerda0[i] = cuerda_actual[i];
+    cuerda_actual[i] = cuerda1[i];
+  }
 }
 
 
+// funcion que imprime los valores de la cuerda actual 
 
-
-	return 0;
+void imprime(double* cuerda, int n){
+  for (int i = 0; i<n;i++){
+    cout<< cuerda[i]<<" ";
+  }
+  cout<<endl;
 }
+

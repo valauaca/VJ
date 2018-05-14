@@ -1,60 +1,32 @@
 #include <iostream>
 #include <math.h>
+#include "iostream"
+#include "fstream"
+#include "math.h"
 
 using namespace std;
 
 
 // declarar conste
 
-
-double L= 5.0;
-double l= 2.0;
-double d=1.0;
-double h=5.0/512.0;
-int tam= L/h;
-int N= 2*tam*tam;
-double v0=100.0;
+int n=511;
+double placas[511][511];
+float v[511][511];
+float v1[511][511];
+float L= 5.0;
+float h=5.0/512.0;
 
 
-// funciones
-
-void V( int tam, double **MV, double d, double h, double l, double L, double v0, double k, double **MV0);
-void actualiza( int tam, double **MV, double **MV0);
-
-
-void inicializarE(int tam, double **MEx, double **MEy);
-void campo(double **MEx, double **MEy, double **MV, double tam, double h);
 
 
 // inicializa funciones
-
-void V( int tam, double **MV, double d, double h, double l, double L, double v0, double k, double **MV0){
-
-	double z=L-d;
-	double x=L+d;
-	double c= L-l;
-	double s=c/(2*h);
-	double f=(c+2*l)/2*h;
-	int h0= z/(2*h);
-	int hf= x/(2*h);
+void iniciar(){
 
 	
-	for( int i =s; i<f; i++){
+	for( int i =0; i<n; i++){
 
-		for (int j= hf; j<f; j++){
-			MV[i][j]=v0/2.0;
-
-
-		}
-
-
-
-	}
-
-	for( int i =s; i<f; i++){
-
-		for (int j= h0; j<f; j++){
-			MV[i][j]=-1.0*v0/2.0;
+		for (int j= 0; j<n; j++){
+			placas[i][j]=0;
 
 
 		}
@@ -63,114 +35,168 @@ void V( int tam, double **MV, double d, double h, double l, double L, double v0,
 
 	}
 
-	for (int i=1; i< (tam-1); i++){
+	// condici{on inicial
+	for( int i =0; i<n; i++)
+	{
 
-		for (int j=1; j< (tam-1); j++){
-			double g;
-			double y;
+		placas[i][0]=2;
+		placas[i][n-1]=2;
+		placas[0][i]=2;
+		placas[n-1][0]=2;
 
-			g=(MV0[i+1][j] + MV0[i][j+1] + MV[i-1][j]+ MV[i][j-1])/4.0;
-			y= g- MV0[i][j];
 
-			MV[i][j]=MV0[i][j] +k*y;
+
+	}
+
+	float d=1.0;
+	float r=2.0;
+	int c= (r/L);
+	int w= (d/L);
+	int k=n*((0.5)-(0.5)*c);
+	int f=n*c;
+	int h0= n*((0.5)-(0.5)*w);
+	int hf= n*(w);
+
+	for (int i=k; i< k+f; i++){
+
+		placas[h0][i]=1;
+		placas[h0+hf][i]=-1;
+		
+
+	}
+
+	for (int i=0; i<n; i++){
+
+		for(int j=0; j<n; j++){
+
+			if(placas[i][j]==0 | placas[i][j]==2){
+
+
+				v[i][j]=0.0;
+			}
+
+			else if (placas[i][j]==1){
+
+				v[i][j]=50.0;
+			}
+			else if(placas[i][j]==-1){
+
+				v[i][j]=-50.0;
+			}
+
+			v1[i][j]=v[i][j];
 
 		}
 
+
 	}
+
+
 }
+
+void actualizar(){
+
+
+	for (int i=0; i<n; i++){
+
+		for(int j=0; j<n;j++){
+
+			if(placas[i][j]==0){
+				v1[i][j]=v[i][j+1]+v[i][j-1]+v[i+1][j]+v[i-1][j];
+				v1[i][j]=v1[i][j]/4.0;
+			}
+
+		}
+	}
+
+	for(int i=0; i<n; i++){
+
+		for (int j=0; j<n;i++){
+
+			v[i][j]=v1[i][j];
+		}
+	}
+
+
+}
+
+
+
 
 	
 
-void inicializarE(int tam, double **MEx, double **MEy){
+void imprimir_datos(){
 
-	for (int i =0; i<(tam-2.0); i++){
+	double campo_E[511][511][2];
 
-		for (int j=0; j< (tam-2.0); j++){
-			MEx[i][j]=0;
-			MEy[i][j]=0;
+	ofstream datos_placas("datos_placas.txt");
+
+	for (int i =0; i<n; i++){
+
+		for (int j=0; j< n; j++){
+
+			datos_placas << v[i][j] << ",";
+
+			if(placas[i][j]!=2){
+
+
+				campo_E[i][j][0]=(-1)*(v1[i][j]-v1[i][j-1])/h;
+				campo_E[i][j][1]=(-1)*(v1[i][j]-v1[i-1][j])/h;
+
+			}
+			else{
+				campo_E[i][j][0]=0.0;
+				campo_E[i][j][1]=0.0;
+
+			}
+
+				
 		}
+		datos_placas<< endl;
 	}
-}
 
+	for(int i=0; i<n; i++){
 
-void actualiza( int tam, double **MV, double **MV0){
+		for(int j=0; j<n; j++){
+
+			datos_placas << campo_E[i][j][0] << ",";
+		}
+		datos_placas << endl;
+
+	}
+
+	for (int i=0; i < n; i++){
+
+		for (int j=0; j<n; j++){
+
+			datos_placas << campo_E[i][j][1] << ",";
+		}
+		datos_placas << endl;
+	}
 
 
 	
-	// actualiza 
-
-	for (int i=0; i<tam; i++){
-		for (int j=0; j< tam; j++){
-			MV0[i][j]=MV[i][j];
-		} 
-	}
-
-
 }
 
-
-void campo(double **MEx, double **MEy, double **MV, int tam, double h){
-
-	double r= 2*h;
-	for (int i=1; i< (tam-2.0); i++){
-
-		for (int j=0; j< (tam-2.0); j++){
-
-			MEx[i][j]=(MV[i-1][j]-MV[i+1][j])/r;
-			MEy[i][j]=(MV[i][j+1]-MV[i][j-1])/r;
-
-			cout << MV[i][j] <<" "<< MEy[i][j] << " " << MEx[i][j]<< endl; 
-		}
-	}
-
-
-}
 
 
 int main(){
 
 
 
-	//POR QUEEE
-	double k=1.1;
+	iniciar();
 
-	double **MV;
-	double **MV0;
-	double **MEx;
-	double **MEy;
+	int nt= int(0.01*2*n*n); 
 
-	MV=new double *[tam];
-	MV0= new double *[tam];
 
-	MEx=new double*[tam-2];
-	MEy=new double*[tam-2];
+	for (int i=0; i< nt; i++){
 
-	// llenar matriz V y V0
-
-	for (int i=0; i< tam; i++){
-
-		MV[i]=new double[tam];
-		MV0[i]= new double[tam];
+		actualizar();
 	}
 
-	//lenar matriz Ex y Ey
-
-	for (int i=0; i< (tam-2);i++){
-
-		MEx[i]= new double[tam-2];
-		MEy[i]= new double[tam-2];
-	}
 	
 
-	inicializarE(tam, MEx, MEy);
-	for (int i=0; i< 100; i++){
-	
-		V(tam, MV, d, h, l, L, v0, k, MV0);
-		actualiza(tam, MV, MV0);
-
-	}
-
-	campo (MEx, MEy, MV, tam, h);
+	imprimir_datos();
 
 	return 0;
 
