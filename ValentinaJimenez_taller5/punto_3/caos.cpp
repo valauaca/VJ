@@ -64,20 +64,20 @@ int main(){
     double k1p1 = dp1(q1);
     double k1p2 = dp2(q1,q2);
 
-    double k2q1 = dq1(p1+k1q1*(dt/2.0));
-    double k2q2 = dq2(p2+k1q2*(dt/2.0));
-    double k2p1 = dp1(q1+k1p1*(dt/2.0));
-    double k2p2 = dp2(q1+k1p2*(dt/2.0),q2+k1p2*(dt/2.0));
+    double k2q1 = dq1(p1+k1p1*(dt/2.0));
+    double k2q2 = dq2(p2+k1p2*(dt/2.0));
+    double k2p1 = dp1(q1+k1q1*(dt/2.0));
+    double k2p2 = dp2(q1+k1q2*(dt/2.0),q2+k1q2*(dt/2.0));
 
-    double k3q1 = dq1(p1+k2q1*(dt/2.0));
-    double k3q2 = dq2(p2+k2q2*(dt/2.0));
-    double k3p1 = dp1(q1+k2p1*(dt/2.0));
-    double k3p2 = dp2(q1+k2p2*(dt/2.0),q2+k2p2*(dt/2.0));
+    double k3q1 = dq1(p1+k2p1*(dt/2.0));
+    double k3q2 = dq2(p2+k2p2*(dt/2.0));
+    double k3p1 = dp1(q1+k2q1*(dt/2.0));
+    double k3p2 = dp2(q1+k2q2*(dt/2.0),q2+k2q2*(dt/2.0));
 
-    double k4q1 = dq1(p1+k3q1*dt);
-    double k4q2 = dq2(p2+k3q2*dt);
-    double k4p1 = dp1(q1+k3p1*dt);
-    double k4p2 = dp2(q1+k3p2*dt,q2+k3p2*dt);
+    double k4q1 = dq1(p1+k3p1*dt);
+    double k4q2 = dq2(p2+k3p2*dt);
+    double k4p1 = dp1(q1+k3q1*dt);
+    double k4p2 = dp2(q1+k3q2*dt,q2+k3q2*dt);
 
     q1 += (dt/6.0)*(k1q1+2*k2q1+2*k3q1+k4q1);
     q2 += (dt/6.0)*(k1q2+2*k2q2+2*k3q2+k4q2);
